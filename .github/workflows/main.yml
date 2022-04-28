@@ -14,11 +14,11 @@ on:
       MANIFEST_BRANCH:
         description: 'LIBRARY_BRANCH'
         required: true
-        default: 'twrp-10.0-deprecated'
+        default: 'twrp-9.0'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
-      required: true
-        default: 'https://github.com/brigudav/android_device_xiaomi_surya_twrp'
+        required: true
+        default: ''
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
