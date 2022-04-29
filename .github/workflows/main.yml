@@ -1,4 +1,4 @@
-name: Android-Recovery-Builder
+name: Тестовая сборка TWRP
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
       MANIFEST_BRANCH:
         description: 'LIBRARY_BRANCH'
         required: true
-        default: 'twrp-9.0'
+        default: 'twrp-8.1'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-18.04
     
     steps:
-    - name: Check Out
-      uses: actions/checkout@main
-      
-    - name: Prepare the environment
+    - name: Проверка
+      uses: actions/checkout@v3
+
+    - name: Подготавливаем окружение
       run: |
         docker rmi `docker images -q`
         sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/sudo apt/sources.list.d
@@ -49,43 +49,41 @@ jobs:
         sudo apt -y upgrade
         sudo apt -y install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev tree lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip jq bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev imagemagick libbz2-dev libssl-dev lzma ncftp bash-completion python openjdk-8-jdk qemu-user-static
       
-    - name: Set variables
+    - name: Задаём переменные
       run: |
         echo "::set-output name=date::$(date +%F)"
       id: var
       
-    - name: Install repo
+    - name: Устанавливаем repo
       run: |
         mkdir ~/bin
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         chmod a+x ~/bin/repo
         export PATH=~/bin:$PATH
       
-    - name: Initialize repo
+    - name: Инициализируем repo
       run: |
         PATH=~/bin:$PATH
         mkdir workspace
         cd workspace
         echo "::set-output name=pwd::$(pwd)"
-        git config --global user.name "Brigudav"
-        git config --global user.email "alexvl1972@hotmail.com"
         repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
       id: pwd
           
-    - name: Repo Sync
+    - name: Синхронизируем repo
       run: |
         PATH=~/bin:$PATH
         cd workspace
         repo sync -j$(nproc --all) -f --force-sync
         ls -al
       
-    - name: Clone device tree
+    - name: Клонируем device tree
       run: |
         PATH=~/bin:$PATH
         cd ${{ steps.pwd.outputs.pwd }}
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
 
-    - name: Building recovery
+    - name: Компилируем recovery
       run: |
         PATH=~/bin:$PATH
         cd ${{ steps.pwd.outputs.pwd }}
